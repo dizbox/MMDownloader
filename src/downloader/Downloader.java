@@ -26,6 +26,7 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.File;
 import java.net.HttpURLConnection;
 import java.net.SocketTimeoutException;
 import java.net.URL;
@@ -427,11 +428,16 @@ public class Downloader {
 			conn.setRequestProperty("charset", "utf-8");
 			conn.setRequestProperty("User-Agent", UserAgent.getUserAgent());
 			//conn.setRequestProperty("Accept-Encoding", "gzip");
-			
-			int len, imageSize = conn.getContentLength(); // byte size
-			InputStream inputStream = conn.getInputStream(); //속도저하의 원인
-			
+
 			String savePath = String.format("%s%03d%s", path, pageNum, getExt(imgURL, ".jpg"));
+			File outputFile = new File(savePath);
+
+			int len, imageSize = conn.getContentLength(); // byte size
+
+			if(outputFile.exists() && outputFile.length()==imageSize) {
+				return imageSize;
+			}
+			InputStream inputStream = conn.getInputStream(); //속도저하의 원인
 
 			BufferedInputStream bis = new BufferedInputStream(inputStream, BUF_SIZE);
 			BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(savePath), BUF_SIZE);
